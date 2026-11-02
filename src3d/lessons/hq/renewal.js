@@ -20,9 +20,12 @@ export default {
     const hose = beam(k, RUBBER, 0.04);
     const jetP = partsNamed(k, '清洗')[0].obj; const mist = Array.from({ length: 16 }, () => k.mesh(new THREE.SphereGeometry(0.05, 6, 4), 0xcfe8f5, [0, -9, 0], { shadow: false, opacity: 0.8 }));
     // 第5步：热水循环（锅炉车）
-    const boil = truck(k, [11, 0, 2.6], Math.PI, 0xd9534f); boil.userData.bed.visible = false; k.box([1.7, 1.0, 1.0], [-0.4, 0.5, 0], 0xb9433f, { parent: boil, anchor: 'bottom', round: 0.08 }); k.cyl(0.08, 0.6, [-0.9, 1.5, 0.3], DARK, { parent: boil, anchor: 'bottom' });
+    const boil = truck(k, [11, 0, -2.6], Math.PI, 0xd9534f); boil.userData.bed.visible = false; k.box([1.7, 1.0, 1.0], [-0.4, 0.5, 0], 0xb9433f, { parent: boil, anchor: 'bottom', round: 0.08 }); k.cyl(0.08, 0.6, [-0.9, 1.5, 0.3], DARK, { parent: boil, anchor: 'bottom' });
     // 热水从标高较低的下游端口通入，经内衬管流向上游端口，再回到锅炉车循环
-    const hot = flow(k, [[10.2, 0.9, 2.2], [MX - 0.2, 0.3, 1.2], [MX - 0.2, CY + 0.3, 0.5], [PX - 0.2, CY + 0.25, 0.3], [-PX + 0.2, CY + 0.25, 0.3], [-MX + 0.2, CY + 0.3, 0.5], [-MX + 0.2, 0.3, 1.4], [0, 0.35, 2.3], [10.2, 0.6, 2.4]], 40, 0xe9762b, 0.07, 0.06);
+    // 进、回水胶管铺在保留的后半幅地面上（剖切时不悬空）
+    const HP = [[10.2, 0.9, -2.2], [MX - 0.2, 0.3, -1.2], [MX - 0.2, CY + 0.3, -0.5], [PX - 0.2, CY + 0.25, -0.3], [-PX + 0.2, CY + 0.25, -0.3], [-MX + 0.2, CY + 0.3, -0.5], [-MX + 0.2, 0.3, -1.4], [0, 0.32, -3.4], [10.2, 0.6, -3.2]];
+    const hot = flow(k, HP, 40, 0xe9762b, 0.07, 0.06);
+    const hoses = [k.tube(HP.slice(0, 3), 0.08, RUBBER), k.tube(HP.slice(5), 0.08, RUBBER)];
     const suck = beam(k, RUBBER, 0.07); const sludge = Array.from({ length: 18 }, () => k.mesh(new THREE.SphereGeometry(0.07, 6, 4), 0x6e5a3e, [0, -9, 0], { shadow: false }));
     const P3 = (pts, u, out) => { let L = 0; const seg = []; for (let i = 1; i < pts.length; i++) { const d = pts[i].distanceTo(pts[i - 1]); seg.push(d); L += d; } let r = u * L; for (let i = 0; i < seg.length; i++) { if (r <= seg[i]) return out.copy(pts[i]).lerp(pts[i + 1], r / seg[i]); r -= seg[i]; } return out.copy(pts[pts.length - 1]); };
     const sp = [new THREE.Vector3(), new THREE.Vector3(MX - 0.3, CY - RI + 0.15, -0.3), new THREE.Vector3(MX - 0.5, 0.8, -1.2)], tmp = new THREE.Vector3();
@@ -36,7 +39,7 @@ export default {
       suck.visible = s === 2; if (s === 2) suck.set(a.set(MX - 0.5, 0.8, -1.2), b.set(MX - 0.3, CY - RI + 0.15, -0.3));
       sp[0].set(jetP.position.x + 1.0, CY - RI + 0.12, -0.25);
       sludge.forEach((m, i) => { m.visible = s === 2 && p < 0.7; if (!m.visible) return; P3(sp, (t * 0.12 + i / sludge.length) % 1, tmp); m.position.copy(tmp); });
-      boil.visible = s === 4; hot(t, s === 4 && p < 0.55);
+      boil.visible = s === 4; hoses.forEach(h => { h.visible = s === 4; }); hot(t, s === 4 && p < 0.55);
       ws.forEach((w, i) => { w.visible = s === 1 && p > 0.5; w.position.set(i ? MX + 0.8 : -MX - 0.8, 0, i ? 1.6 : 1.2); w.userData.arm.rotation.z = Math.sin(t * 3 + i) * 0.6; });
     });
   },

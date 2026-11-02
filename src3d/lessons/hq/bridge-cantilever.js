@@ -1,9 +1,24 @@
-import { THREE, C, smooth, crawlerCrane, worker, flow, partsNamed, ORANGE } from './lib.js';
+import { THREE, C, smooth, towerCrane, worker, flow, partsNamed, ORANGE } from './lib.js';
 const YT = 10.2;
 export default {
   build(k) {
-    // 两台履带吊分别服务左右两个T构（吊运混凝土料斗）
-    const cr = [[-16.5, -5.5, 0.35], [16.5, -5.5, Math.PI - 0.35]].map(([x, z, ry]) => crawlerCrane(k, [x, 0, z], ry, { boom: 15, angle: 1.0 }));
+    // 两台塔吊分别立在左右主墩旁（吊运混凝土料斗）。起重臂高于挂篮桁架，回转时不穿过梁体和挂篮
+    const TH = 15.5, JL = 12;
+    const cr = [-9, 9].map(x => {
+      const g = towerCrane(k, [x, 0, -5.4], 0, TH, JL + 1), top = g.userData.top;
+      const trolley = k.group([0, 0, 0], top); k.box([0.45, 0.22, 0.4], [0, -0.12, 0], 0x4a5157, { parent: trolley, round: 0.04 });
+      const cable = k.cyl(0.018, 1, [0, 0, 0], 0x222222, { parent: k.root, seg: 6 }); cable.geometry.translate(0, -0.5, 0);
+      const hook = k.group([0, 0, 0]); k.box([0.3, 0.35, 0.22], [0, 0, 0], 0xf2c230, { parent: hook, round: 0.06 });
+      const base = new THREE.Vector3(), tip = new THREE.Vector3();
+      return { hook, aim(target) {
+        g.updateMatrixWorld(true); base.set(0, 0, 0); g.localToWorld(base);
+        const dx = target.x - base.x, dz = target.z - base.z; top.rotation.y = Math.atan2(-dz, dx);
+        trolley.position.x = Math.min(JL - 0.4, Math.max(1.2, Math.hypot(dx, dz)));
+        top.updateMatrixWorld(true); tip.set(0, -0.25, 0); trolley.localToWorld(tip);
+        const ty = Math.min(tip.y - 0.4, target.y + 0.45); hook.position.set(tip.x, ty, tip.z);
+        cable.position.copy(tip); cable.scale.y = Math.max(0.05, tip.y - ty);
+      } };
+    });
     const hoppers = cr.map(() => { const g = k.group(); k.cyl(0.45, 0.8, [0, 0, 0], ORANGE, { parent: g, r2: 0.45, anchor: 'top', seg: 20, rough: 0.4 }); k.cyl(0.12, 0.35, [0, -0.95, 0], 0x555a5f, { parent: g, r2: 0.45 }); return g; });
     const trav = partsNamed(k, '挂篮').map(p => p.obj); // order: pier -9 dir -1, -9 +1, 9 -1, 9 +1
     // 挂篮平台工人

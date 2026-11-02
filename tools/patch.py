@@ -1,5 +1,7 @@
+import os as _os
+ROOT=_os.environ.get('SZROOT') or _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 import re
-O='/workspace/sz/original/'; V='/workspace/sz/v2/'
+O=ROOT+'/original/'; V=ROOT+'/v2/'
 b=open(O+'bundle.js',encoding='utf8').read()
 a='Pn=u0(Q("spatialHost"))'
 assert b.count(a)==1, b.count(a)
@@ -17,7 +19,8 @@ h=h.replace('./styles.css?v=14','./styles.css?v=15').replace('<script src="./bun
 h=h.replace('V14 · 清甜配音 · 看懂再复述','V15 · 立体施工 · 看懂再复述')
 assert 'v=15' in h and 'anim3d' in h
 open(V+'index.html','w',encoding='utf8').write(h)
-css=open(O+'styles.css',encoding='utf8').read()+'\n'+open('/workspace/sz/src3d/v15.css',encoding='utf8').read()
+css=open(O+'styles.css',encoding='utf8').read()+'\n'+open(ROOT+'/src3d/v15.css',encoding='utf8').read()
 open(V+'styles.css','w',encoding='utf8').write(css)
 print('patched')
-import subprocess; subprocess.run(['python3','/workspace/sz/tools/declutter.py'],check=True)
+import subprocess; subprocess.run(['python3',ROOT+'/tools/declutter.py'],check=True)
+subprocess.run(['python3',ROOT+'/tools/textfix.py'],check=True)

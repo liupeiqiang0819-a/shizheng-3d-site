@@ -2,14 +2,14 @@
 import { THREE, COLORS as C, smooth, lerp, table, vBoredStrata, halfCyl } from '../engine.js';
 
 const R = 0.9, TOP = 0, BOT = -13, YB = -16, XA = -9, XB = 9, ZF = 6;
-const OTHER = [-3, 3];
+const OTHER = [-3, 3], CAP_B = -1.4, CAP_T = 0.2;
 
 export default {
   cams: [
     { pos: [7, 6, 16], target: [0, -2, 0] }, { pos: [9, 2, 19], target: [0, -6, 0] }, { pos: [8, -2, 17], target: [0, -8, 0] },
     { pos: [9, 2, 19], target: [0, -5, 0] }, { pos: [8, -1, 18], target: [0, -7, 0] }, { pos: [10, 7, 21], target: [0, -2, 0] },
   ],
-  phases: ['钻机对中、平台稳固', '钻具旋转下钻 · 泥浆护壁', [[0, '钻具提出后检孔、清孔'], [0.6, '成孔后转入检查与清孔']], [[0, '钢筋笼平稳下放'], [0.5, '再安放灌注导管'], [0.85, '灌注前复查条件']], '底口始终埋在混凝土内', '墩台 → 承台 → 桩群'],
+  phases: ['钻机对中、平台稳固', '钻具旋转下钻 · 泥浆护壁', [[0, '钻具提出后检孔、清孔'], [0.6, '成孔后转入检查与清孔']], [[0, '钢筋笼平稳下放'], [0.5, '再安放灌注导管'], [0.85, '灌注前复查条件']], '底口始终埋在混凝土内', [[0, '凿除超灌桩头，核查桩位与桩身质量'], [0.25, '承台把桩群连成整体'], [0.82, '墩台 → 承台 → 桩群']]],
   build(k) {
     table(k, XA, XB, -ZF, ZF, YB);
     const cols = [C.soil2, C.clay, C.sand, C.soil3, C.soil4], hs = [2.5, 3, 2.5, 3.5, 3];
@@ -48,7 +48,11 @@ export default {
     const bit = k.group([0, 0, 0], rod); k.cyl(R - 0.08, 0.7, [0, 0, 0], C.machineDark, { parent: bit, anchor: 'top', seg: 16 }); for (let i = 0; i < 4; i++) { const t = k.box([1.5, 0.12, 0.12], [0, -0.7, 0], C.steel, { parent: bit }); t.rotation.y = i * Math.PI / 4; }
     k.part(rod, { name: '钻具', on: 0, enter: 'fade', win: [0.85, 0.95], off: 3, exit: 'fade', outWin: [0, 0.1] });
     // hole inspection gauge (step 2)
-    const gauge = k.group([0, 0, 0]); k.cyl(R - 0.15, 2.2, [0, 0, 0], C.steel, { parent: gauge, open: true, seg: 12, opacity: 0.6, side: THREE.DoubleSide });
+    // 笼式检孔器：外径接近设计孔径，吊绳下放到孔底再提出（不透明，便于在泥浆中看清）
+    const gauge = k.group([0, 0, 0]);
+    for (const y of [-1.1, -0.37, 0.37, 1.1]) k.ring(R - 0.16, R - 0.1, 0.06, [0, y, 0], C.steel, { parent: gauge, rot: [Math.PI / 2, 0, 0], seg: 20, metal: 0.5 });
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; k.box([0.05, 2.2, 0.05], [Math.cos(a) * (R - 0.13), 0, Math.sin(a) * (R - 0.13)], C.steel, { parent: gauge, metal: 0.5 }); }
+    const gWire = k.cyl(0.02, 1, [0, 0, 0], 0x222222, { seg: 6 }); gWire.geometry.translate(0, 0.5, 0);
     k.part(gauge, { name: '检孔', on: 2, enter: 'none', win: [0, 0.01], off: 3, exit: 'none', outWin: [0, 0.01] });
     // rebar cage + tremie
     const cage = k.group([0, BOT + 0.4, 0]);
@@ -60,7 +64,7 @@ export default {
     // concrete rising
     const conc = sides.map(sd => k.part(halfCyl(k, R - 0.02, TOP - BOT - 0.4, [0, BOT, 0], 0x9da5a8, sd, { anchor: 'bottom', opacity: 0.8 }), { name: '混凝土', on: 4, enter: 'grow', win: [0.05, 0.95], front: sd > 0 }));
     // cap + pier
-    const cap = k.split((a, b) => k.zbox(9, 1.6, a, b, 0, -1.4, C.concreteNew, { anchor: 'bottom' }), { name: '承台', on: 5, enter: 'grow', win: [0.25, 0.55] }, -2.4, 2.4);
+    const cap = k.split((a, b) => k.zbox(9, CAP_T - CAP_B, a, b, 0, CAP_B, C.concreteNew, { anchor: 'bottom' }), { name: '承台', on: 5, enter: 'grow', win: [0.25, 0.55] }, -2.4, 2.4);
     void cap;
     k.split((a, b) => k.zbox(2, 7, a, b, 0, 0.2, C.concreteNew, { anchor: 'bottom' }), { name: '墩台', on: 5, enter: 'grow', win: [0.55, 0.8] }, -1.2, 1.2);
     for (const x of [0, ...OTHER]) k.part(k.arrow([x, -1.6, 0.1], [0, -1, 0], 2.2, C.red, { r: 0.08 }), { on: 5, enter: 'pop', win: [0.82, 0.95] });
@@ -81,8 +85,14 @@ export default {
       mud.forEach(m => { m.scale.y = Math.max(0.01, 0.6 - mudBot); });
       // gauge lowering in step 2
       gauge.position.y = s === 2 ? lerp(2, BOT + 1, smooth(p, 0.05, 0.4)) + (2 - (BOT + 1)) * smooth(p, 0.5, 0.75) : 30;
+      gWire.visible = s === 2 && gauge.position.y < 2.5; gWire.position.y = gauge.position.y + 1.1; gWire.scale.y = Math.max(0.05, 3.2 - gWire.position.y);
       if (s === 4) tremie.position.y = Math.max(BOT + 0.2, concTop - 1.5) + 12.8;
-      void conc;
+      // 第6步：先凿除超灌桩头至设计桩顶（嵌入承台约0.1m），露出的主筋锚入承台、不伸出承台顶面
+      if (s >= 5) {
+        const cut = s === 5 ? smooth(p, 0.08, 0.24) : 1, H = TOP - BOT - 0.4;
+        conc.forEach(c => { c.scale.y = 1 - cut * (1 - (CAP_B + 0.1 - BOT) / H); c.traverse(n => { if (n.isMesh) { n.material.opacity = 1; n.material.depthWrite = true; } }); });
+        cage.scale.y = (CAP_T - 0.12 - (BOT + 0.4)) / (TOP - BOT + 0.6);
+      }
     });
   },
 };

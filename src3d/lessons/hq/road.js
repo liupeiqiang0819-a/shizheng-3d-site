@@ -1,4 +1,4 @@
-import { THREE, roller, paver, truck, worker, flow, reskin } from './lib.js';
+import { THREE, roller, paver, truck, worker, flow, reskin, DARK as DARKF } from './lib.js';
 const ZS = -2.2; // 剖切时机械走在保留的后半幅中线上
 export default {
   build(k) {
@@ -10,6 +10,11 @@ export default {
     // 熨平板：贴在铺层上，横跨摊铺宽度
     const sc = k.box([0.55, 0.3, 1], [-1.6, 0, 0], 0x5b6168, { parent: pv, anchor: 'bottom', round: 0.04 });
     const T = k.root.children.filter(o => o.isGroup && o !== P && o !== R && o.userData.bed).pop();
+    // 第4步透层油洒布车：去掉自卸车厢，换成保温沥青罐 + 尾部洒布管
+    if (T) { T.userData.bed.visible = false; const tank = k.group([-0.4, 0.5, 0], T);
+      k.cyl(0.42, 1.75, [0, 0.44, 0], 0x2f3337, { parent: tank, axis: 'x', seg: 22, rough: 0.35, metal: 0.3 });
+      for (const x of [-0.85, 0.85]) k.cyl(0.43, 0.06, [x, 0.44, 0], 0x6f7f8a, { parent: tank, axis: 'x', seg: 22, metal: 0.5 });
+      k.cyl(0.1, 0.12, [0.2, 0.9, 0], 0x6f7f8a, { parent: tank, seg: 12 }); k.box([1.7, 0.08, 0.7], [0, 0, 0], DARKF, { parent: tank, anchor: 'bottom' }); }
     // 第5步：自卸车倒车贴近摊铺机料斗，车厢后铰点翻起卸料
     const dt = truck(k, [0, 0, 0], 0, 0x6b7378); const bed = dt.userData.bed;
     const mixF = flow(k, [[-0.7, 1.2, 0], [-1.35, 0.85, 0], [-1.75, 0.75, 0]], 14, 0x26282a, 0.09, 0.5, dt);

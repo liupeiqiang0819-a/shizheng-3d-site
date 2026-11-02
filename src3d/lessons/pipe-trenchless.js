@@ -10,7 +10,7 @@ export default {
     { pos: [4, 10, 24], target: [0, -3.5, 0] }, { pos: [-2, 5, 13], target: [-9, -4, -2.4] }, { pos: [3, 4, 17], target: [-1, -4.5, -2.4] },
     { pos: [3, 5, 22], target: [-2, -3.5, 2] }, { pos: [5, 5, 22], target: [2, -3.5, 2] }, { pos: [4, 10, 24], target: [0, -3.5, 0] },
   ],
-  phases: ['两种独立路线：顶管与定向钻不能串成一道工序', [[0, '后背承受反力；导轨控制轴线'], [0.6, '洞口止水与土体稳定先具备条件']], [[0, '整列管节一起推进：接口间距不变'], [0.5, '橙色：顶推；绿色：管外减阻泥浆']], [[0, '钻头前进到哪里，钻杆才跟到哪里'], [0.6, '导向孔阶段：地下还没有成品管']], [[0, '扩孔、清孔已完成；此画面演示回拖'], [0.3, '钻杆 → 扩孔器 → 回拖接头 → 成品管']], '两条成管路线分别检验；贯通不等于可投运'],
+  phases: ['两种独立路线：顶管与定向钻不能串成一道工序', [[0, '后背承受反力；导轨控制轴线'], [0.6, '洞口止水与土体稳定先具备条件']], [[0, '整列管节一起推进：接口间距不变'], [0.5, '橙色：顶推；绿色：管外减阻泥浆']], [[0, '钻头前进到哪里，钻杆才跟到哪里'], [0.6, '导向孔阶段：地下还没有成品管']], [[0, '扩孔、清孔合格后，及时连续回拖'], [0.3, '钻杆 → 扩孔器 → 回拖接头 → 成品管']], '两条成管路线分别检验；贯通不等于可投运'],
   build(k) {
     table(k, -15, 15, -7, 7, -10);
     k.split((a, b) => k.strata(-15, 15, -10, 0, a, b, { colors: [C.soil1, C.soil2, C.clay, C.soil3], heights: [2, 2.5, 3, 2.5] }), { soil: true }, -7, 7);
@@ -53,7 +53,6 @@ export default {
     k.label('预制管向画外延续', [16, 1.8, HZ], { steps: [4] });
     k.label('顶管：端部处理、线形与功能检验', [0, -3.4, JZ], { steps: [5] });
     k.label('定向钻：回拖后成管检查、对应试验', [0, -7.6, HZ], { steps: [5] });
-    const segCount = 120 * 8 * 6;
     k.onUpdate((s, p, t, st) => {
       cars.forEach((c, i) => { c.position.z = (((t * 2.2 * c.userData.d + i * 5) % 14) + 14) % 14 - 7; });
       // jacking: head front position
@@ -70,8 +69,8 @@ export default {
       tip.visible = s === 3; const tp = curve.getPointAt(Math.max(0.001, pilot)); tip.position.copy(tp); tip.lookAt(curve.getPointAt(Math.min(1, pilot + 0.01))); tip.rotateY(-Math.PI / 2);
       locator.visible = s === 3; locator.position.set(tp.x, 0.1, HZ + 1.2);
       const pull = s < 4 ? 0 : s === 4 ? smooth(p, 0.05, 0.95) : 1; // fraction from the exit side
-      prodTube.visible = s >= 4; prodTube.geometry.setDrawRange((120 - Math.floor(pull * 120)) * 48, segCount);
-      reamer.visible = s === 4; const rp = curve.getPointAt(Math.min(0.999, Math.max(0.001, 1 - pull))); reamer.position.copy(rp);
+      prodTube.visible = s >= 4; prodTube.geometry.setDrawRange((120 - Math.floor(pull * 120)) * 84, 120 * 84); // 成品管 14 边形截面：每段 14×6 个索引，与扩孔器位置对齐
+      reamer.visible = s === 4; const ru = Math.min(0.999, Math.max(0.011, 1 - pull)), rp = curve.getPointAt(ru); reamer.position.copy(rp); reamer.lookAt(curve.getPointAt(ru - 0.01)); reamer.rotateY(Math.PI / 2);
       onSurf.visible = s === 4; onSurf.position.x = 18 - 10 * pull;
       void st;
     });

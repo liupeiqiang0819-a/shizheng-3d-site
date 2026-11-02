@@ -1,6 +1,8 @@
 # Build /workspace/sz/web/{core,voice-a,voice-b,video-a,video-b} from v2 for free static hosting (25 MB/site).
+import os as _os
+ROOT=_os.environ.get('SZROOT') or _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 import os, shutil, re, sys
-SRC='/workspace/sz/v2'; OUT='/workspace/sz/web'; PFX=os.environ.get('SLUGPFX','sz2027')
+SRC=ROOT+'/v2'; OUT=ROOT+'/web'; PFX=os.environ.get('SLUGPFX','sz2027')
 host=lambda s: f'https://{PFX}-{s}.deed.page/'
 shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT)
 core=f'{OUT}/core'; shutil.copytree(SRC, core, ignore=shutil.ignore_patterns('voice-trial','videos','atlas-offline-*.zip'))

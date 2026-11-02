@@ -6,6 +6,8 @@ const PX = 4.5, PZ = 3.2, BASE = -6, TS = [-7.5, 0, 5.5];
 const W = ['看场外控制桩与仪器的连线，先确认参照体系。', '看测站照准的位置怎样落成轴线桩与高程标记。', '分清参照用基准点与随被测对象布置的监测点。', '看支护和建筑监测点，不把单次读数当最终结论。', '看位移箭头与趋势线。', '看建成实体与实测轮廓，和设计放样起点作对照。'];
 
 export default {
+  // 控制桩、测站、轴线桩都在地面上：默认不剖切，避免观察侧地面去掉后仪器和人员悬空（工具栏仍可切换剖切）
+  view: { section: false },
   cams: [
     { pos: [4, 13, 21], target: [0, -1, 0] }, { pos: [3, 11, 17], target: [0, -1, 0] }, { pos: [6, 10, 18], target: [1, -1, -1] },
     { pos: [7, 6, 17], target: [0, -3, 0] }, { pos: [7, 7, 16], target: [1, -2, -1] }, { pos: [6, 9, 18], target: [0, -1.5, 0] },
@@ -31,6 +33,9 @@ export default {
     const lvl = k.group([-PX - 1.2, 0.35, 0.12]); k.mesh(new THREE.ConeGeometry(0.12, 0.2, 3).rotateX(Math.PI), 0xe9762b, [0, 0, 0], { parent: lvl }); k.part(lvl, { name: '高程标记', on: 1, enter: 'pop', win: [0.8, 0.9] });
     // supports + monitoring points; benchmarks are away from the pit
     pitWalls(k, { px: PX, pz: PZ, bottom: -8.5, on: 2, win: [0.02, 0.3], name: '支护' });
+    // 支护施工前，墙位槽口用原状土填平（不剖切时地表连续，不出现空槽）
+    { const WT = 0.6, ox = PX + WT, oz = PZ + WT, slot = (sx, sz, x, z) => k.part(k.box([sx, 1.5, sz], [x, -1.5, z], C.soil1, { anchor: 'bottom', flat: true }), { soil: true, off: 2, exit: 'fade', outWin: [0, 0.03] });
+      slot(WT, 2 * oz, -(PX + WT / 2), 0); slot(WT, 2 * oz, PX + WT / 2, 0); slot(2 * PX, WT, 0, -(PZ + WT / 2)); slot(2 * PX, WT, 0, PZ + WT / 2); void ox; }
     const bms = [[-10, -3], [10, 3]].map(([x, z]) => { const g = k.group([x, 0, z]); k.cyl(0.2, 0.25, [0, 0, 0], C.blue, { parent: g, anchor: 'bottom', emissive: C.blue, ei: 0.3 }); return k.part(g, { name: '基准点', on: 2, enter: 'pop', win: [0.35, 0.5] }); });
     const mps = [[-PX - 0.3, -PZ - 0.3], [0, -PZ - 0.3], [PX + 0.3, -PZ - 0.3], [-PX - 0.3, 0], [PX + 0.3, 0], [0, PZ + 0.3]];
     const mpObjs = mps.map(([x, z], i) => { const g = k.group([x, 0.3, z]); k.cyl(0.06, 0.4, [0, 0, 0], C.white, { parent: g, anchor: 'bottom', seg: 8 }); k.mesh(new THREE.SphereGeometry(0.14, 10, 8), C.red, [0, 0.45, 0], { parent: g, emissive: C.red, ei: 0.4 }); k.part(g, { name: '监测点', on: 2, enter: 'pop', win: [0.55 + i * 0.05, 0.62 + i * 0.05], front: z > PZ, hl: [2, 3] }); return g; });

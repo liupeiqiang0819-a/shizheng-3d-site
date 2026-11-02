@@ -9,6 +9,12 @@ export default {
     const cr = k.parts.filter(p => p.on === 3 && p.off === 5 && p.enter === 'none');
     const crane = cr[1]?.obj, bucket = cr[2]?.obj; const cable = beam(k, 0x333333, 0.02);
     const tip = new THREE.Vector3(), b = new THREE.Vector3();
+    // 第1步：坑内土体在剖切面后方挡住中间柱 —— 本步把坑内后半土体逐渐转为半透明，看清立柱桩成孔与钢管柱插入
+    const pitSoil = k.parts.filter(p => p.soil && !p.front && p.exit === 'grow' && p.off >= 1 && p.off <= 4);
+    k.onUpdate((s, p) => {
+      if (s !== 0) return; const op = lerp(1, 0.28, smooth(p, 0.12, 0.3));
+      for (const q of pitSoil) for (const mm of q.mats) { if (!mm.m.transparent) { mm.m.transparent = true; mm.m.needsUpdate = true; } mm.m.opacity = op; mm.m.depthWrite = op > 0.99; }
+    });
     k.onUpdate((s, p, t) => {
       // 第1步：中间柱成孔
       const rOn = s === 0 && p > 0.2 && p < 0.8; rig.g.visible = rOn; rig.set(lerp(0.3, -12.5, smooth(p, 0.3, 0.7)), t * 3);

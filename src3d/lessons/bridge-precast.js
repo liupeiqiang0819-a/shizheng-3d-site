@@ -52,7 +52,8 @@ export default {
     for (const z of ZB) k.box([0.6, 0.12, 0.12], [0, -0.1, z], C.red, { parent: rebar, emissive: C.red, ei: 0.4 });
     k.part(rebar, { name: '湿接头', on: 4, enter: 'fade', win: [0.22, 0.4], off: 5, exit: 'none', outWin: [0, 0.01] });
     k.split((a, b) => k.zbox(0.6, BH + 0.18, a, b, 0, beamY - BH / 2, 0xc9cfc6, { anchor: 'bottom' }), { name: '湿接头', on: 4, enter: 'grow', win: [0.45, 0.75] }, -1.2, 1.2);
-    k.part(k.tube([[-11, beamY - 0.3, 0.75], [-6, beamY - 0.4, 0.75], [-1, beamY + 0.35, 0.75], [1, beamY + 0.35, 0.75], [6, beamY - 0.4, 0.75], [11, beamY - 0.3, 0.75]], 0.07, C.red, { emissive: C.red, ei: 0.5 }), { name: '预应力', on: 4, enter: 'fade', win: [0.8, 0.95] });
+    // 墩顶负弯矩预应力束：位于中墩两侧梁端顶板内，穿过湿接头连接两跨（不是通长布置的跨中下弯束）
+    { const yF = beamY + BH / 2 + 0.09, zT = -0.12; k.part(k.tube([[-4.6, yF - 0.05, zT], [-3.2, yF, zT], [-1, yF + 0.03, zT], [1, yF + 0.03, zT], [3.2, yF, zT], [4.6, yF - 0.05, zT]], 0.06, C.red, { emissive: C.red, ei: 0.5 }), { name: '预应力', on: 4, enter: 'fade', win: [0.8, 0.95] }); }
     k.label('吊点、站位与设备由方案确定', [-6, 12, -7], { steps: [2], win: [0, 0.3] });
     k.label('吊具退出 · 梁体保持稳定', [-6, 10.5, -1.3], { steps: [3], win: [0, 0.3] });
     const v = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
