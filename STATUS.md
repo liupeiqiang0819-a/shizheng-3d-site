@@ -53,3 +53,9 @@
 - bridge-pile：补正循环泥浆泵、胶管、钻杆内下行颗粒及孔壁环空上返。
 - 文字清理：tools/declutter.py（由 patch.py 自动调用，188 处）+ src3d 标签/阶段文字 28 处；来源、免责、画法说明删除；章节/教材定位/版本徽标/核对提示改为不显示。日志 tools/txt/declutter.log。
 - 截图 screens/textbook/；preview、core 均 19/19 v15、0 errors。
+
+## 2026-11-02 逐单元复查（分支 fix/content-anim-review）
+- 构建：tools/build.sh、patch.py、declutter.py、make-web.py 改为按脚本所在目录定位仓库（也可用环境变量 SZROOT 指定），不再写死 /workspace/sz；esbuild 通过 NODE_PATH=tools/node_modules 找 three；original/assets 缺媒体文件时跳过复制。
+- 新增 tools/textfix.py（patch.py 在 declutter.py 之后调用）：清理残留页码出处/免责文字、数字卡出处行、配音"机器复核/待核"字样，并补 3 处教材考点；日志 tools/txt/textfix.log。
+- 3D 修正：bridge-cantilever 改墩旁塔吊（原履带吊臂穿挂篮）；bridge-precast 墩顶负弯矩束；bridge-pile 凿桩头、钢筋笼不伸出承台、笼式检孔器；pipe-trenchless 扩孔器位于成品管前端；top-down 第1步坑内土半透明看中间柱；起重机隐藏时吊钩一并隐藏；survey-monitor 默认不剖切；renewal 进回水胶管；road 透层油洒布罐车；若干阶段文字去掉"此例/此图/放大演示/已压缩/剖面外"。
+- 测试：smoke.js 增加作答后看讲解、等待步号变化；新增 tools/stepwalk.js（每单元下一步走到第6步再上一步）。19/19 单元 v15 画布、逐步前进后退正常、控制台 0 错误；手机 390 宽无横向溢出。

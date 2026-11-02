@@ -1,0 +1,30 @@
+clean	1	trap:"孔道浆体强度口径有差异；必须带条款与设计条件，不可任选一个数。"
+clean	1	condition:"P82安装条款：先满足设计吊装强度；设计无要求时，一般不低于设计强度75%。"
+clean	1	condition:"P82安装条款：设计无要求时。P81场内移运条款另有设计强度75%的表述，不能混作同一通则。"
+clean	1	；图示边坡不是通用放坡参数。"
+clean	1	trap:"0.3m对应本书软弱饱和土层开挖段落；与P227“200mm人工配合清底”保留各自条件，不合并成一个万能值。
+clean	1	condition:"P164所述软弱而饱和土层、机械车辆不易下坑的开挖情形。"
+clean	1	trap:"P227的200mm是该质量控制条文的人工配合清底要求；
+clean	1	condition:"本书3.8.2基坑开挖质量控制条文；不得超挖或扰动基底土。"
+clean	1	condition:"本书3.8.2地铁车站明挖结构施工质量控制，混凝土终凝后及时养护。"
+clean	1	condition:"本书盖挖法施工一般规定；
+clean	1	condition:"本书浅埋暗挖二次衬砌泵送混凝土质量控制。"
+clean	1	condition:"本书推进管理测量条文；
+clean	2	按已提供的新版对照资料，天然气管道采用钢管
+clean	1	action:"依据设计布置低处滞留区
+clean	1	action:"依据评估和适用条件选定原位固化方案
+clean	1	keypoint:"依据缺陷评估与适用条件选法
+clean	1	保持贴合压力，依据监测判断固化状态
+clean	1	action:"依据设计坐标和标高，由控制点测设
+clean	1	取得变形控制依据。"
+clean	1	<p class="number-condition">${vt(t.condition)}</p><small>${v
+clean	1	"图示首批建立埋深后，连续灌注并保持导管埋入"
+clean	1	Ke("voiceBadge","本步清甜配音待核 \xB7 静音")
+clean	1	Ke("voiceBadge",i.voice||"清甜版试听 \xB7 机器初筛")
+clean	1	<p class="study-small">核查日期：${Tm}。出版社公开页面检索未取得可逐页核对的2026全文及完
+clean-re	112	voice:"清甜版试听 \\xB7 [^"]*"
+content	1	meaning:"桩顶超灌高度",condition:"高出设计桩顶标高，确保凿除浮浆后桩头质量。",source:"2
+content	1	meaning:"闭水试验渗水量观测时间",condition:"达到规定试验水头后计时，持续补水保持试验水头恒定，渗水
+content	1	keypoint:"两侧对称、平衡逐段悬浇；本段达到条件并完成预应力后，挂篮才能前移。"
+html	1	仅保存在当前浏览器，不代表掌握，也不与聊天练题记录同步。
+html	1	仅保存在当前浏览器。不会自动同步设备或本聊天；导入会合并历史，保留首次作答。

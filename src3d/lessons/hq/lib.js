@@ -68,6 +68,8 @@ export function crawlerCrane(k, pos, rotY = 0, o = {}) {
   const cable = k.cyl(0.018, 1, [0, 0, 0], 0x222222, { parent: k.root, seg: 6 }); cable.geometry.translate(0, -0.5, 0);
   const hook = k.group([0, 0, 0]); k.box([0.3, 0.35, 0.22], [0, 0, 0], PAINT, { parent: hook, round: 0.06 }); k.cyl(0.06, 0.25, [0, -0.3, 0], DARK, { parent: hook });
   const tip = new THREE.Vector3(), tmp = new THREE.Vector3(), base = new THREE.Vector3();
+  // 吊钩和钢丝绳挂在场景根节点上：起重机隐藏时一并隐藏（排在各单元自身更新之后执行，避免吊钩悬空）
+  queueMicrotask(() => k.onUpdate(() => { for (let n = g; n; n = n.parent) if (!n.visible) { hook.visible = cable.visible = false; return; } }));
   const ctl = {
     g, top, hook, cable,
     aim(target, show = true) { // target: world point under the hook

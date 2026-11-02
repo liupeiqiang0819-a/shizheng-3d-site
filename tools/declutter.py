@@ -1,6 +1,8 @@
 # remove source notes / disclaimers / drawing-method notes from page text (V15 text round)
+import os as _os
+ROOT=_os.environ.get('SZROOT') or _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 import re,sys
-V='/workspace/sz/v2/'
+V=ROOT+'/v2/'
 def dec(s):
     def f(m):
         c=int(m.group(1),16)
@@ -202,6 +204,6 @@ h,m2=apply(h,H,'html')
 open(V+'index.html','w',encoding='utf8').write(h)
 c=open(V+'styles.css',encoding='utf8').read()
 if CSS not in c: open(V+'styles.css','a',encoding='utf8').write(CSS)
-open('/workspace/sz/tools/txt/declutter.log','w').write('\n'.join(log))
+open(ROOT+'/tools/txt/declutter.log','w').write('\n'.join(log))
 print('applied',len(log),'missing',len(m1)+len(m2))
 for x in m1+m2: print('MISS',x[:80])

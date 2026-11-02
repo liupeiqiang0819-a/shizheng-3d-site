@@ -11,7 +11,7 @@ export default {
     { pos: [6, 9, 21], target: [0, -2.5, 0] }, { pos: [8, 7, 18], target: [-1, -3, 0] }, { pos: [5, 4, 15], target: [0, -4, 0] },
     { pos: [7, 8, 20], target: [0, -2, 0] }, { pos: [7, 7, 19], target: [0, -1.5, 0] }, { pos: [8, 9, 21], target: [0, -1, 0] },
   ],
-  phases: [[[0, '稳定地基；场底排水坡度不应小于2%']], [[0, '库底与边坡的防渗衬层连续'], [0.55, '试焊、焊接、检验与保护分别落实']], [[0, '导排管在膜上；接剖面外集液处理设施'], [0.55, '导排层保护防渗膜，污水不进入地下水系统']],
+  phases: [[[0, '稳定地基；场底排水坡度不应小于2%']], [[0, '库底与边坡的防渗衬层连续'], [0.55, '试焊、焊接、检验与保护分别落实']], [[0, '导排管在膜上，接渗沥液收集处理设施'], [0.55, '导排层保护防渗膜，污水不进入地下水系统']],
     '系统检测合格才运营；分层作业与覆盖', [[0, '液体、气体分别收集；同步监测堆体与环境'], [0.5, '填埋气：运营期即收集处理']], [[0, '封场覆盖与导气立管交接处密封'], [0.6, '封场后，导液、导气与监测维护持续']]],
   build(k) {
     table(k, -12, 12, -Z, Z, -9);
@@ -69,7 +69,7 @@ export default {
     k.split((a, b) => k.profile(-XC, XC, x => Math.max(0, capTop(x)) + 0.12, x => Math.max(0, capTop(x)), a, b, C.membrane, { n: 30 }), { name: '封场覆盖', on: 5, enter: 'grow', axis: 'x', win: [0.05, 0.35] }, -Z, Z);
     k.split((a, b) => k.profile(-XC, XC, x => Math.max(0, capTop(x)) + 0.6, x => Math.max(0, capTop(x)) + 0.12, a, b, C.grass, { n: 30, flat: true }), { name: '植被', on: 5, enter: 'grow', axis: 'x', win: [0.35, 0.65] }, -Z, Z);
     for (const x of [-3, 3]) k.part(k.cyl(0.38, 0.3, [x, capTop(x) + 0.55, 0.05], C.machine), { name: '密封', on: 5, enter: 'pop', win: [0.62, 0.75] });
-    k.label('导排管在膜上；接剖面外集液处理设施', [0, surf(0) + 1.4, 5], { steps: [2], win: [0.6, 1] });
+    k.label('导排管在膜上，接渗沥液收集处理设施', [0, surf(0) + 1.4, 5], { steps: [2], win: [0.6, 1] });
     const surfPath = u => { const x = lerp(-4.5, 0, u); return new THREE.Vector3(x, surf(x) + 0.5, 0.2); };
     k.onUpdate((s, p, t) => {
       // gas wells extend with the waste lifts in step 3
